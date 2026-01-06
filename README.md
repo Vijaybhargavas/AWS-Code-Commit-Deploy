@@ -15,31 +15,103 @@ The overall deployment failed because too many individual instances failed deplo
 
 ===========================
 
-EC2 script on creation to install the CodeDeploy Agent:
+SCRIPT 1 — Manual Install (Ubuntu):
 
 ```
 #!/bin/bash
 set -e
 
-echo "🔄 Updating system..."
-sudo yum update -y
+echo "Updating system..."
+sudo apt update -y
 
-echo "⬇️ Installing Node.js 18 LTS..."
-curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
-sudo yum install -y nodejs
+echo "Installing prerequisites..."
+sudo apt install -y curl ca-certificates gnupg
 
-echo "✅ Verifying Node.js installation..."
+echo "Installing Node.js 18 LTS..."
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+
+echo "Verifying Node.js installation..."
 node -v
 npm -v
 
-echo "⬇️ Installing application dependencies..."
+echo "Installing Express..."
 sudo npm install express
 
-echo "⬇️ Installing supporting tools (ruby, wget)..."
+echo "Installing supporting tools (ruby, wget)..."
+sudo apt install -y ruby wget
+
+echo "Setup completed successfully!"
+echo "You can now run: node app.js"
+```
+SCRIPT 2 — Manual Install (Amazon Linux / ec2-user):
+
+```
+#!/bin/bash
+set -e
+
+echo "Updating system..."
+sudo yum update -y
+
+echo "Installing prerequisites..."
+sudo yum install -y curl ca-certificates
+
+echo "Installing Node.js 18 LTS..."
+curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+sudo yum install -y nodejs
+
+echo "Verifying Node.js installation..."
+node -v
+npm -v
+
+echo "Installing Express..."
+sudo npm install express
+
+echo "Installing supporting tools (ruby, wget)..."
 sudo yum install -y ruby wget
 
-echo "🎉 Setup completed successfully!"
-echo "👉 You can now run: node app.js"
+echo "Setup completed successfully!"
+echo "You can now run: node app.js"
+```
+SCRIPT 3 — CodeDeploy Agent (Ubuntu EC2 User Data):
+
+```
+#!/bin/bash
+set -e
+
+apt update -y
+apt install -y ruby wget
+
+cd /home/ubuntu
+
+wget https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install
+chmod +x install
+./install auto
+
+sleep 30
+
+systemctl restart codedeploy-agent
+systemctl enable codedeploy-agent
+```
+SCRIPT 4 — CodeDeploy Agent (Amazon Linux EC2 User Data):
+
+```
+#!/bin/bash
+set -e
+
+yum update -y
+yum install -y ruby wget
+
+cd /home/ec2-user
+
+wget https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install
+chmod +x install
+./install auto
+
+sleep 30
+
+systemctl restart codedeploy-agent
+systemctl enable codedeploy-agent
 ```
 How to run it:
 ```
