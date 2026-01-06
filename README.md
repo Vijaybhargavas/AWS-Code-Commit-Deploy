@@ -19,17 +19,33 @@ EC2 script on creation to install the CodeDeploy Agent:
 
 ```
 #!/bin/bash
-sudo yum -y update
-sudo amazon-linux-extras install epel -y
-curl -sL https://rpm.nodesource.com/setup_6.x | sudo -E bash -
-sudo yum install nodejs -y
+set -e
+
+echo "🔄 Updating system..."
+sudo yum update -y
+
+echo "⬇️ Installing Node.js 18 LTS..."
+curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+sudo yum install -y nodejs
+
+echo "✅ Verifying Node.js installation..."
+node -v
+npm -v
+
+echo "⬇️ Installing application dependencies..."
 sudo npm install express
-sudo yum -y install ruby
-sudo yum -y install wget
-cd /home/ec2-user
-wget https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install
-sudo chmod +x ./install
-sudo ./install auto
+
+echo "⬇️ Installing supporting tools (ruby, wget)..."
+sudo yum install -y ruby wget
+
+echo "🎉 Setup completed successfully!"
+echo "👉 You can now run: node app.js"
+```
+How to run it:
+```
+chmod +x shell.sh
+./shell.sh
+
 ```
 
 Check if CodeDeploy agent is running:
