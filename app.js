@@ -60,7 +60,7 @@ app.get('/', (req, res) => {
 
   header {
     background: linear-gradient(90deg, #1a237e, #3949ab);
-    color: white;
+    color: green;
     padding: 35px;
     text-align: center;
   }
